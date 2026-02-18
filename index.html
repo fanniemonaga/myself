@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vanessa's Haven</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap');
+        
+        :root {
+            --pink: #f8c1d3;
+        }
+        
+        .tail-container {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .hero-bg {
+            background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), 
+                            url("35.jpg");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .gallery-img {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gallery-img:hover {
+            transform: scale(1.08) rotate(2deg);
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+        }
+
+        .heart {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .message-card {
+            transition: all 0.3s ease;
+        }
+        
+        .message-card:hover {
+            transform: translateY(-8px) rotate(2deg);
+        }
+
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #f8c1d3;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover:after {
+            width: 100%;
+        }
+
+        .modal {
+            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes modalPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Gallery filter tabs */
+        .filter-tab {
+            transition: all 0.3s ease;
+        }
+        .filter-tab.active {
+            background: #ec4899;
+            color: white;
+        }
+
+        /* Load more animation */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .gallery-item-new {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        /* Gallery grid item */
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            cursor: pointer;
+            aspect-ratio: 1;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .gallery-item .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 1rem;
+        }
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+
+        /* Modal nav buttons */
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .modal-nav:hover { background: white; }
+        .modal-nav.prev { left: -24px; }
+        .modal-nav.next { right: -24px; }
+    </style>
+</head>
+<body class="tail-container bg-gradient-to-br from-pink-50 via-white to-purple-50 text-gray-800">
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-pink-200">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-pink-500 rounded-2xl flex items-center justify-center text-white text-xl">❤</div>
+                <h1 class="text-2xl font-bold heading-font tracking-tight text-pink-600">Vanessa's Haven❤</h1>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#home" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">Home</a>
+                <a href="#about" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">About</a>
+                <a href="#gallery" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">Gallery</a>
+                <a href="#love" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">Love Messages</a>
+                <a href="#quotes" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">Quotes</a>
+                <a href="#motivation" class="nav-link text-gray-600 hover:text-pink-600 transition-colors">Motivation</a>
+            </div>
+
+            <button onclick="toggleMobileMenu()" 
+                    class="md:hidden w-10 h-10 flex items-center justify-center text-2xl text-pink-600">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t border-pink-200 py-4">
+            <div class="flex flex-col gap-4 px-6 text-center font-medium">
+                <a href="#home" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">Home</a>
+                <a href="#about" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">About</a>
+                <a href="#gallery" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">Gallery</a>
+                <a href="#love" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">Love Messages</a>
+                <a href="#quotes" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">Quotes</a>
+                <a href="#motivation" onclick="toggleMobileMenu()" class="py-2 text-gray-700 hover:text-pink-600">Motivation</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="home" class="hero-bg h-screen flex items-center justify-center text-white relative">
+        <div class="max-w-4xl mx-auto text-center px-6 z-10">
+            <!--<div class="mb-6 inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-6 py-2 rounded-3xl">
+                <span class="text-pink-200">Pretoria, South Africa</span>
+            </div>-->
+            
+            <h1 class="text-7xl md:text-8xl heading-font font-bold tracking-tighter mb-4 leading-none">
+                Hey, I'm <span class="text-pink-300">Vanessa</span>
+            </h1>
+            <p class="text-2xl md:text-3xl font-light mb-8 max-w-lg mx-auto">
+                A dreamer, a lover, and a woman who believes in magic.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#love" 
+                   class="px-10 py-5 bg-white text-pink-600 font-semibold rounded-3xl hover:bg-pink-100 transition-all flex items-center justify-center gap-3 text-lg">
+                    <i class="fa-solid fa-heart"></i>
+                    Read Love Messages
+                </a>
+                <a href="#gallery" 
+                   class="px-10 py-5 border-2 border-white font-semibold rounded-3xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 text-lg">
+                    <i class="fa-solid fa-images"></i>
+                    See My Gallery
+                </a>
+            </div>
+        </div>
+
+        <!-- Floating hearts -->
+        <div class="absolute bottom-12 left-12 text-4xl text-pink-300 opacity-30 heart" style="animation-delay: 0s;">❤</div>
+        <div class="absolute bottom-24 right-20 text-5xl text-pink-300 opacity-30 heart" style="animation-delay: 1.2s;">💕</div>
+        <div class="absolute top-1/3 left-1/4 text-3xl text-pink-300 opacity-30 heart" style="animation-delay: 0.8s;">✨</div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="inline-block bg-pink-100 text-pink-600 px-5 py-2 rounded-3xl text-sm font-medium mb-6">CHAPTER 01 • ABOUT ME</div>
+                    <h2 class="text-6xl heading-font font-bold leading-none mb-8">Vanessa a Limpopo girl</h2>
+                    <div class="prose prose-lg text-gray-600">
+                        <p class="text-xl">I'm a 22-year-old South African woman who loves sunsets over the Magaliesberg, braai nights with my partner, and chasing every dream that makes my heart race.</p>
+                        <p>I believe life is too short to be anything but happy. This little corner of the internet is my safe space — filled with memories, love, and motivation to keep going.</p>
+                    </div>
+                    <div class="mt-10 flex gap-8">
+                        <div>
+                            <div class="text-4xl font-bold text-pink-500">22</div>
+                            <div class="text-sm text-gray-500">Years old</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-pink-500">∞</div>
+                            <div class="text-sm text-gray-500">Dreams</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold text-pink-500">Venda</div>
+                            <div class="text-sm text-gray-500">Home</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <img src="22.jpg" 
+                         alt="Vanessa" 
+                         class="rounded-3xl shadow-2xl w-full">
+                    <div class="absolute -bottom-6 -right-6 bg-white rounded-3xl p-6 shadow-xl max-w-[220px]">
+                        <p class="italic text-gray-500">"Every day is a new page in my story."</p>
+                        <div class="text-pink-600 font-medium mt-4">— Vanessa❤</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" class="py-24 bg-gradient-to-b from-white to-pink-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <div class="inline-block bg-pink-100 text-pink-600 px-5 py-2 rounded-3xl text-sm font-medium mb-4">CHAPTER 02 • MEMORIES</div>
+                <h2 class="text-6xl heading-font font-bold">My Gallery</h2>
+                <p class="mt-4 text-gray-600 max-w-md mx-auto">Moments that made my heart smile</p>
+                <div class="mt-4 inline-flex items-center gap-2 bg-pink-600 text-white px-5 py-2 rounded-full text-sm font-medium">
+                    <i class="fa-solid fa-images"></i>
+                    <span id="photoCount">0 Photos</span>
+                </div>
+            </div>
+
+            <!-- Filter tabs -->
+            <div class="flex flex-wrap gap-3 justify-center mb-10">
+                <button onclick="filterGallery('all')" class="filter-tab active px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="all">All Photos</button>
+                <button onclick="filterGallery('nature')" class="filter-tab px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="nature">🌿 Nature</button>
+                <button onclick="filterGallery('city')" class="filter-tab px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="city">🏙️ City</button>
+                <button onclick="filterGallery('people')" class="filter-tab px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="people">👯 People</button>
+                <button onclick="filterGallery('vibes')" class="filter-tab px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="vibes">✨ Vibes</button>
+                <button onclick="filterGallery('travel')" class="filter-tab px-6 py-2 rounded-full border border-pink-200 text-sm font-medium hover:bg-pink-50 transition-all" data-filter="travel">✈️ Travel</button>
+            </div>
+
+            <!-- Empty state -->
+            <div id="emptyState" class="text-center py-16 text-gray-400 hidden">
+                <div class="text-6xl mb-4">🖼️</div>
+                <p class="text-xl">No photos in this category</p>
+                <p class="text-sm mt-2">Switch to another tab to see photos</p>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- Populated by JS from the galleryImages array below -->
+            </div>
+
+            <!-- Load more -->
+            <div class="text-center mt-12">
+                <button id="loadMoreBtn" onclick="loadMorePhotos()"
+                        class="hidden px-8 py-4 bg-pink-600 hover:bg-pink-700 text-white rounded-3xl font-medium inline-flex items-center gap-3">
+                    <i class="fa-solid fa-plus"></i>
+                    Load More Photos
+                </button>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="mt-8 max-w-md mx-auto">
+                <div class="flex justify-between text-sm text-gray-500 mb-2">
+                    <span id="shownCount"></span>
+                    <span id="progressPct"></span>
+                </div>
+                <div class="w-full bg-pink-100 rounded-full h-2">
+                    <div id="progressBar" class="bg-pink-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOVE MESSAGES -->
+    <section id="love" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <div class="inline-block bg-pink-100 text-pink-600 px-5 py-2 rounded-3xl text-sm font-medium mb-4">CHAPTER 03 • LOVE NOTES</div>
+                <h2 class="text-6xl heading-font font-bold">Messages of Love</h2>
+                <p class="mt-4 text-gray-600">Words that make me feel like the luckiest girl in the world</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex justify-center gap-4 mb-10">
+                <button onclick="switchLoveTab('messages')" id="tab-messages"
+                        class="love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 bg-pink-600 text-white shadow-md">
+                    <i class="fa-solid fa-heart"></i> Love Messages
+                </button>
+                <button onclick="switchLoveTab('quotes')" id="tab-quotes"
+                        class="love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 border-2 border-pink-300 text-pink-600 hover:bg-pink-50">
+                    <i class="fa-solid fa-quote-left"></i> Love Quotes
+                </button>
+            </div>
+
+            <!-- Messages panel -->
+            <div id="panel-messages">
+                <div id="messagesContainer" class="grid md:grid-cols-2 gap-8">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Quotes panel -->
+            <div id="panel-quotes" class="hidden">
+                <div id="loveQuotesContainer" class="grid md:grid-cols-2 gap-8">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Shuffle button -->
+            <div class="text-center mt-12">
+                <button onclick="reshuffleLove()"
+                        class="px-10 py-5 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-3xl hover:from-pink-600 hover:to-purple-600 transition-all inline-flex items-center gap-3 text-lg">
+                    <i class="fa-solid fa-shuffle"></i>
+                    Show me more ✨
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUOTES -->
+    <section id="quotes" class="py-24 bg-gradient-to-b from-pink-50 to-white">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <div class="inline-block bg-pink-100 text-pink-600 px-5 py-2 rounded-3xl text-sm font-medium mb-6">CHAPTER 04 • WISDOM</div>
+            <h2 class="text-6xl heading-font font-bold mb-12">Inspirational Quotes</h2>
+            
+            <div id="quoteCard" 
+                 class="bg-white rounded-3xl shadow-xl p-12 max-w-2xl mx-auto min-h-[280px] flex flex-col justify-center">
+                <p id="quoteText" class="text-3xl italic leading-relaxed text-gray-700"></p>
+                <p id="quoteAuthor" class="mt-8 text-pink-600 font-medium"></p>
+            </div>
+
+            <button onclick="newQuote()" 
+                    class="mt-10 px-10 py-5 border-2 border-pink-300 hover:bg-pink-50 rounded-3xl font-medium text-lg transition-all">
+                ✨ Another Beautiful Quote
+            </button>
+        </div>
+    </section>
+
+    <!-- MOTIVATIONAL -->
+    <section id="motivation" class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <div class="inline-block bg-pink-100 text-pink-600 px-5 py-2 rounded-3xl text-sm font-medium mb-4">CHAPTER 05 • MOTIVATION</div>
+                <h2 class="text-6xl heading-font font-bold">Daily Motivation</h2>
+            </div>
+
+            <div id="motivationContainer" class="grid md:grid-cols-3 gap-8">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="text-center mt-12">
+                <button onclick="newMotivation()" 
+                        class="px-8 py-4 bg-pink-600 text-white rounded-3xl font-medium flex items-center gap-3 mx-auto">
+                    <i class="fa-solid fa-rotate"></i>
+                    Give me more fire
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex justify-center gap-8 text-3xl mb-8">
+                <a href="#" class="hover:text-pink-400 transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" class="hover:text-pink-400 transition-colors"><i class="fa-brands fa-tiktok"></i></a>
+                <a href="#" class="hover:text-pink-400 transition-colors"><i class="fa-brands fa-whatsapp"></i></a>
+            </div>
+            <p class="text-gray-400">Made with so much love • 2026</p>
+            <p class="text-xs text-gray-500 mt-6">This website was created especially for you, Vanessa❤. Keep shining ✨</p>
+        </div>
+    </footer>
+
+    <!-- GALLERY MODAL -->
+    <div id="imageModal" class="hidden fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-6">
+        <div class="modal relative max-w-4xl w-full">
+            <button onclick="closeModal()" 
+                    class="absolute -top-4 -right-4 bg-white text-gray-900 w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-xl z-10">
+                ✕
+            </button>
+            <!-- Prev/Next navigation -->
+            <button onclick="modalPrev()" class="modal-nav prev shadow-xl">‹</button>
+            <button onclick="modalNext()" class="modal-nav next shadow-xl">›</button>
+
+            <img id="modalImage" 
+                 class="w-full rounded-3xl shadow-2xl max-h-[80vh] object-contain" 
+                 alt="Gallery photo">
+            <div class="text-center mt-4">
+                <p id="modalCaption" class="text-white text-lg italic"></p>
+                <p id="modalCounter" class="text-gray-400 text-sm mt-1"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════════════
+        // 📸 HOW TO ADD YOUR OWN PHOTOS
+        // ───────────────────────────────────────────────────────────────────────────
+        // 1. Put your image files in the SAME FOLDER as this HTML file.
+        // 2. Add each photo to the list below like this:
+        //
+        //    { src: "your-photo.jpg",  caption: "Caption here",  category: "people" }
+        //
+        // Categories: "nature" | "city" | "people" | "vibes" | "travel"
+        //
+        // Example:
+        //    { src: "birthday.jpg",    caption: "My birthday ✨",  category: "people" },
+        //    { src: "sunset.jpg",      caption: "Beautiful sunset", category: "nature" },
+        //    { src: "cape-town.jpg",   caption: "Cape Town 🏔️",    category: "travel" },
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        const galleryImages = [
+            { src: "1.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "2.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "3.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "4.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "5.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "6.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "7.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "8.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "9.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "10.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "11.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "12.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "13.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "14.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "15.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "16.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "17.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "18.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "19.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "20.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "21.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "22.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "23.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "24.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "25.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "26.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "27.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "28.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "29.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "30.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "31.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "32.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "33.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "34.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "35.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "36.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "37.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "38.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "39.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "40.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "41.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "42.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "43.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "44.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "45.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "46.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "47.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "48.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "49.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "50.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "51.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "52.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "53.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "54.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "55.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "56.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "57.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "58.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "59.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "60.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "61.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "62.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "63.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "64.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "65.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "66.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "67.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "68.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "69.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "70.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "71.jpg",   caption: "My birthday ✨",    category: "people" },
+			{ src: "72.jpg",     caption: "Magaliesberg glow", category: "nature" },
+			{ src: "73.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "74.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "75.jpg",   caption: "Home 💜",            category: "city"   },
+			{ src: "76.jpg",   caption: "Cape Town 🏔️",      category: "travel" },
+			{ src: "77.jpg",     caption: "Sunday mornings ☕", category: "vibes"  },
+			{ src: "78.jpg",   caption: "Home 💜",            category: "city"   },
+        ];
+
+        // ── Gallery State ─────────────────────────────────────────────────────────
+        let currentFilter = 'all';
+        let displayedCount = 24;
+        let currentModalIndex = 0;
+        let filteredImages = [];
+
+        function updatePhotoCount() {
+            const total = galleryImages.length;
+            document.getElementById('photoCount').textContent = total + (total === 1 ? ' Photo' : ' Photos');
+        }
+
+        function getFiltered() {
+            return currentFilter === 'all'
+                ? galleryImages
+                : galleryImages.filter(img => img.category === currentFilter);
+        }
+
+        function renderGallery() {
+            const container = document.getElementById("galleryGrid");
+            filteredImages = getFiltered();
+            container.innerHTML = "";
+            const emptyState = document.getElementById('emptyState');
+
+            if (galleryImages.length === 0 || filteredImages.length === 0) {
+                emptyState.classList.remove('hidden');
+                updateProgress();
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            filteredImages.slice(0, displayedCount).forEach((img, i) => {
+                const globalIdx = galleryImages.indexOf(img);
+                const div = document.createElement("div");
+                div.className = "gallery-item gallery-item-new";
+                div.style.animationDelay = (i * 0.03) + "s";
+                div.innerHTML = `
+                    <img src="${img.src}" loading="lazy" alt="${img.caption}">
+                    <div class="overlay">
+                        <p class="text-white text-xs font-medium">${img.caption}</p>
+                    </div>
+                `;
+                div.onclick = () => openModal(globalIdx);
+                container.appendChild(div);
+            });
+
+            updateProgress();
+
+            const loadMoreBtn = document.getElementById("loadMoreBtn");
+            if (displayedCount >= filteredImages.length) {
+                loadMoreBtn.classList.add('hidden');
+            } else {
+                loadMoreBtn.classList.remove('hidden');
+            }
+        }
+
+        function updateProgress() {
+            const total = filteredImages.length;
+            const shown = Math.min(displayedCount, total);
+            if (total === 0) {
+                document.getElementById("shownCount").textContent = galleryImages.length === 0 ? "Add photos to the code to get started" : "No photos in this category";
+                document.getElementById("progressPct").textContent = "";
+                document.getElementById("progressBar").style.width = "0%";
+                return;
+            }
+            const pct = Math.round((shown / total) * 100);
+            document.getElementById("shownCount").textContent = `Showing ${shown} of ${total}`;
+            document.getElementById("progressPct").textContent = pct + "%";
+            document.getElementById("progressBar").style.width = pct + "%";
+        }
+
+        function filterGallery(filter) {
+            currentFilter = filter;
+            displayedCount = 24;
+            document.querySelectorAll('.filter-tab').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.filter === filter) btn.classList.add('active');
+            });
+            renderGallery();
+        }
+
+        function loadMorePhotos() {
+            displayedCount += 24;
+            renderGallery();
+        }
+
+        // ── Modal ──────────────────────────────────────────────────────────────────
+        function openModal(index) {
+            if (galleryImages.length === 0) return;
+            currentModalIndex = index;
+            updateModal();
+            document.getElementById("imageModal").classList.remove("hidden");
+            document.getElementById("imageModal").classList.add("flex");
+        }
+
+        function updateModal() {
+            const img = galleryImages[currentModalIndex];
+            if (!img) return;
+            document.getElementById("modalImage").src = img.src;
+            document.getElementById("modalCaption").textContent = img.caption;
+            document.getElementById("modalCounter").textContent = `${currentModalIndex + 1} of ${galleryImages.length}`;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById("imageModal");
+            modal.classList.add("hidden");
+            modal.classList.remove("flex");
+        }
+
+        function modalPrev() {
+            currentModalIndex = (currentModalIndex - 1 + galleryImages.length) % galleryImages.length;
+            updateModal();
+        }
+
+        function modalNext() {
+            currentModalIndex = (currentModalIndex + 1) % galleryImages.length;
+            updateModal();
+        }
+
+        // ── Love Messages & Quotes (hardcoded, shown randomly) ────────────────────
+        // 💌 TO ADD MORE MESSAGES: just add to the arrays below!
+        // ─────────────────────────────────────────────────────────────────────────
+
+        const allLoveMessages = [
+            { from: "Your secret admirer", text: "Vanessa, your laugh is my favourite sound in the whole world. You make every day brighter just by being you.", date: "14 Feb 2026" },
+            { from: "Mom", text: "My beautiful daughter, never forget how proud I am of the woman you've become. You are my greatest blessing.", date: "10 Jan 2026" },
+            { from: "Bestie", text: "To the girl who always shows up for everyone — thank you for showing up for yourself too. Love you endlessly.", date: "02 Feb 2026" },
+            { from: "Dad", text: "You've always been the sunshine of our home, Vanessa. Never stop being you — the world is better with you in it.", date: "25 Dec 2025" },
+            { from: "Your biggest fan", text: "Watching you grow into the woman you are today fills my heart with so much pride. You are unstoppable.", date: "01 Jan 2026" },
+            { from: "Someone who cares", text: "Every room you walk into gets warmer. That's just the kind of magic you carry without even knowing it.", date: "10 Feb 2026" },
+            { from: "Your sister", text: "I couldn't have asked for a better person to grow up with. You're my person, always and forever.", date: "18 Feb 2026" },
+            { from: "Anonymous", text: "Your kindness is rare and your strength is beautiful. Never change, Vanessa. Never change.", date: "05 Feb 2026" },
+            { from: "Your childhood friend", text: "From the playground to now — I've always known you were going to be something special. And look at you! ❤️", date: "12 Jan 2026" },
+            { from: "Your secret admirer", text: "The way you love people — with your whole heart and zero conditions — is the most beautiful thing about you.", date: "07 Feb 2026" },
+        ];
+
+        const allLoveQuotes = [
+            { author: "Pablo Neruda", text: "I love you without knowing how, or when, or from where. I love you simply, without problems or pride." },
+            { author: "Rumi", text: "Your task is not to seek for love, but merely to seek and find all the barriers within yourself that you have built against it." },
+            { author: "Maya Angelou", text: "Love recognises no barriers. It jumps hurdles, leaps fences, penetrates walls to arrive at its destination full of hope." },
+            { author: "Nicholas Sparks", text: "The best love is the kind that awakens the soul and makes us reach for more." },
+            { author: "Victor Hugo", text: "To love another person is to see the face of God." },
+            { author: "E.E. Cummings", text: "I carry your heart with me. I carry it in my heart." },
+            { author: "Audrey Hepburn", text: "The best thing to hold onto in life is each other." },
+            { author: "Unknown", text: "You are the first thought in my morning and the last smile before I sleep." },
+            { author: "F. Scott Fitzgerald", text: "I love her and that's the beginning and end of everything." },
+            { author: "Leo Tolstoy", text: "Love is life. And if you miss love, you miss life." },
+            { author: "John Lennon", text: "Love is the answer, and you know that for sure." },
+            { author: "Khalil Gibran", text: "Love gives naught but itself and takes naught but from itself. Love possesses not nor would it be possessed." },
+        ];
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        let activeLoveTab = 'messages';
+        // Shuffled once per page load
+        let shuffledMessages = shuffle(allLoveMessages);
+        let shuffledQuotes = shuffle(allLoveQuotes);
+        const CARDS_TO_SHOW = 6;
+
+        function renderMessages() {
+            const container = document.getElementById("messagesContainer");
+            container.innerHTML = "";
+            shuffledMessages.slice(0, CARDS_TO_SHOW).forEach(msg => {
+                const card = document.createElement("div");
+                card.className = "message-card bg-white border border-pink-100 rounded-3xl p-8 shadow-sm";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="text-pink-600 font-medium">${msg.from}</div>
+                            <div class="text-xs text-gray-400">${msg.date}</div>
+                        </div>
+                        <div class="text-4xl">💌</div>
+                    </div>
+                    <p class="text-gray-700 leading-relaxed">"${msg.text}"</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLoveQuotes() {
+            const container = document.getElementById("loveQuotesContainer");
+            container.innerHTML = "";
+            shuffledQuotes.slice(0, CARDS_TO_SHOW).forEach(q => {
+                const card = document.createElement("div");
+                card.className = "message-card bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-100 rounded-3xl p-8 shadow-sm";
+                card.innerHTML = `
+                    <div class="text-5xl text-pink-200 mb-4 leading-none">"</div>
+                    <p class="text-gray-700 leading-relaxed text-lg italic mb-6">${q.text}</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-px bg-pink-300"></div>
+                        <span class="text-pink-600 font-medium text-sm">${q.author}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function reshuffleLove() {
+            shuffledMessages = shuffle(allLoveMessages);
+            shuffledQuotes = shuffle(allLoveQuotes);
+            renderMessages();
+            renderLoveQuotes();
+            confettiBurst();
+        }
+
+        function switchLoveTab(tab) {
+            activeLoveTab = tab;
+            document.getElementById('panel-messages').classList.toggle('hidden', tab !== 'messages');
+            document.getElementById('panel-quotes').classList.toggle('hidden', tab !== 'quotes');
+
+            document.getElementById('tab-messages').className = tab === 'messages'
+                ? 'love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 bg-pink-600 text-white shadow-md'
+                : 'love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 border-2 border-pink-300 text-pink-600 hover:bg-pink-50';
+            document.getElementById('tab-quotes').className = tab === 'quotes'
+                ? 'love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 bg-pink-600 text-white shadow-md'
+                : 'love-tab px-8 py-3 rounded-full font-medium text-sm transition-all flex items-center gap-2 border-2 border-pink-300 text-pink-600 hover:bg-pink-50';
+        }
+
+        function loadMessages() {} // no-op, kept for compatibility
+        function setupMessageForm() {} // no-op, form removed
+
+        // ── Confetti ───────────────────────────────────────────────────────────────
+        function confettiBurst() {
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement("div");
+                    heart.textContent = ["❤", "💕", "✨"][Math.floor(Math.random()*3)];
+                    heart.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-50px;font-size:20px;z-index:9999;transition:all 3s;pointer-events:none;`;
+                    document.body.appendChild(heart);
+                    setTimeout(() => { heart.style.transform = `translateY(${window.innerHeight+100}px) rotate(${Math.random()*360}deg)`; heart.style.opacity = "0"; }, 50);
+                    setTimeout(() => heart.remove(), 3500);
+                }, i * 8);
+            }
+        }
+
+        // ── Quotes ────────────────────────────────────────────────────────────────
+        const quotes = [
+            { text: "She remembered who she was and the game changed.", author: "Lalah Delia" },
+            { text: "The most beautiful thing you can wear is confidence.", author: "Blake Lively" },
+            { text: "Be a woman who lifts other women up.", author: "Unknown" },
+            { text: "You are allowed to be both a masterpiece and a work in progress.", author: "Sophia Bush" },
+            { text: "In a world where you can be anything, be kind.", author: "Unknown" },
+            { text: "She believed she could, so she did.", author: "R.S. Grey" },
+            { text: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+            { text: "You are braver than you believe, and stronger than you seem.", author: "A.A. Milne" }
+        ];
+        let currentQuoteIndex = 0;
+
+        function showQuote() {
+            const q = quotes[currentQuoteIndex];
+            document.getElementById("quoteText").textContent = `"${q.text}"`;
+            document.getElementById("quoteAuthor").textContent = `— ${q.author}`;
+        }
+
+        function newQuote() {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            showQuote();
+            confettiBurst();
+        }
+
+        // ── Motivations ───────────────────────────────────────────────────────────
+        let affirmations = [
+            "I am worthy of all the love and success coming my way.",
+            "Every day I become a better version of myself.",
+            "My heart is open and my dreams are big.",
+            "I radiate confidence and positivity.",
+            "I am exactly where I need to be right now.",
+            "My story is still being written and it's beautiful.",
+            "I choose joy, peace, and abundance every single day.",
+            "I am magnetic. Love and good things are drawn to me.",
+            "I grow through what I go through.",
+            "My potential is limitless and my future is bright."
+        ];
+
+        function renderMotivations() {
+            const container = document.getElementById("motivationContainer");
+            container.innerHTML = "";
+            affirmations.slice(0, 3).forEach(a => {
+                const card = document.createElement("div");
+                card.className = "bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-100 rounded-3xl p-8 text-center hover:shadow-xl transition-shadow";
+                card.innerHTML = `<div class="text-5xl mb-6">✨</div><p class="text-xl italic font-light leading-relaxed">"${a}"</p>`;
+                container.appendChild(card);
+            });
+        }
+
+        function newMotivation() {
+            affirmations = affirmations.sort(() => Math.random() - 0.5);
+            renderMotivations();
+            confettiBurst();
+        }
+
+        // ── Mobile menu ───────────────────────────────────────────────────────────
+        function toggleMobileMenu() {
+            document.getElementById("mobileMenu").classList.toggle("hidden");
+        }
+
+        // ── Init ──────────────────────────────────────────────────────────────────
+        function init() {
+            renderGallery();
+            updatePhotoCount();
+            loadMessages();
+            renderMessages();
+            renderLoveQuotes();
+            setupMessageForm();
+            showQuote();
+            renderMotivations();
+
+            // Keyboard navigation
+            document.addEventListener("keydown", function(e) {
+                const modal = document.getElementById("imageModal");
+                if (!modal.classList.contains("hidden")) {
+                    if (e.key === "Escape") closeModal();
+                    if (e.key === "ArrowLeft") modalPrev();
+                    if (e.key === "ArrowRight") modalNext();
+                }
+            });
+
+            // Click outside modal
+            document.getElementById("imageModal").addEventListener("click", function(e) {
+                if (e.target === this) closeModal();
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
